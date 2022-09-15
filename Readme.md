@@ -3,7 +3,7 @@
 Given program implements simple version of linux `ls` command. 
 
 ## Run:
-    `./my_ls [path] [flags]`
+`./my_ls [path] [flags]`
     
 Next flags are implemented:
 - `-a`, `--all` show hidden files and directories
