@@ -17,31 +17,44 @@
 int my_ls (const char* dir_name, bool a_flag, bool l_flag, bool r_flag) {
     ass (dir_name, "null ptr passed", NULL_PTR_PASSED);
 
-    const struct dirent *entry = nullptr;
+    const struct dirent *entry = NULL;
     DIR *directory = opendir(dir_name);
     ass (directory, "Can't open directory", CANT_OPEN_DIR);
+    
+    std::vector<const struct dirent*> directories_to_process;
 
     while ((entry = readdir(directory)) != NULL) {
         
         // skip hidden files
         if (!a_flag && entry->d_name[0] == '.')
             continue;
-        
- 
-        if (r_flag && entry->d_type == DT_DIR 
-                   && strcmp(entry->d_name, "..") != 0 
-                   && strcmp(entry->d_name, ".") != 0) {
 
-            char file_path[PATH_MAX];
-            sprintf (file_path, "%s/%s", dir_name, entry->d_name);
-            printf ("\n%s:\n", entry->d_name);
-
-            return my_ls (file_path, a_flag, l_flag, r_flag);
-        }
-        else if (l_flag)
+        if (l_flag)
             process_long_flag (dir_name, entry);
+        
         else
             printf ("%s\t", entry->d_name);
+        
+        if (r_flag && entry->d_type == DT_DIR 
+            && strcmp(entry->d_name, "..") != 0 
+            && strcmp(entry->d_name, ".")  != 0) {
+            
+            directories_to_process.push_back(entry);
+        }
+
+    }
+
+
+    while (!directories_to_process.empty()) {
+        printf("\n");
+
+        const struct dirent *entry = directories_to_process.back();
+        char file_path[PATH_MAX];
+        sprintf (file_path, "%s/%s", dir_name, entry->d_name);
+        printf (BLUE_CLR "%s:\n" END_CLR, file_path);
+
+        my_ls (file_path, a_flag, l_flag, r_flag);
+        directories_to_process.pop_back();
     }
 
     printf("\n");
@@ -72,7 +85,7 @@ int process_long_flag (const char* dir, const struct dirent *dir_entry) {
     printf((stat_bufer.st_mode & S_IWOTH) ? "w" : "-");
     printf((stat_bufer.st_mode & S_IXOTH) ? "x " : "- ");
 
-    printf("%li ", stat_bufer.st_nlink);
+    printf("%3li ", stat_bufer.st_nlink);
 
     struct passwd *pw = nullptr; 
     struct group *gid = nullptr;
@@ -101,7 +114,11 @@ int process_long_flag (const char* dir, const struct dirent *dir_entry) {
     printf("%s ", formated_time_buf);
 
     //print file name 
-    printf("%s\n", dir_entry->d_name); 
+    if (S_ISDIR(stat_bufer.st_mode))
+        printf (BLUE_CLR);
+
+    printf("%s\n" END_CLR, dir_entry->d_name); 
+
 
     return OK;
 }

@@ -3,8 +3,9 @@
 #include <stdio.h>
 #include <map>
 
-#define RED_CLR "\033[91m"
-#define END_CLR "\033[0m"
+#define RED_CLR  "\033[91m"
+#define BLUE_CLR "\033[94m"
+#define END_CLR  "\033[0m"
 
 #define ass(condition, err_text, ret)                                                   \
     do {                                                                                \
