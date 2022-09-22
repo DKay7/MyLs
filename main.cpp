@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <map>
 #include "ls_core.h"
+#include "arg_parser.h"
 
 int main (const int argc, char* argv[]) {
 
@@ -28,8 +29,8 @@ int main (const int argc, char* argv[]) {
         {'a', {&a_flag, 1}}
     };
 
-    parse_ls_args (argc, argv, short_options, long_options, &path_idx);
-    
+    arg_parser::parse_args (argc, argv, short_options, long_options, &path_idx);
+        
     #ifdef _DEBUG
     printf ("l = %d a = %d r = %d\n", l_flag, a_flag, r_flag);
     #endif

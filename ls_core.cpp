@@ -7,12 +7,9 @@
 #include <grp.h>
 #include <time.h>
 #include <string.h>
-#include <getopt.h> 
-#include <ranges>
 #include <vector>
-#include <map>
 #include "ls_core.h"
-
+#include "err_lib.h"
 
 int my_ls (const char* dir_name, bool a_flag, bool l_flag, bool r_flag) {
     ass (dir_name, "null ptr passed", NULL_PTR_PASSED);
@@ -120,37 +117,5 @@ int process_long_flag (const char* dir, const struct dirent *dir_entry) {
     printf("%s\n" END_CLR, dir_entry->d_name); 
 
 
-    return OK;
-}
-
-int parse_ls_args (int argc, char* argv[], 
-                    std::map<char, std::pair<int*, int>> short_options, 
-                    struct option* options, int* path_idx) {
-    ass (options, "null ptr passed", NULL_PTR_PASSED);
-    ass (argv, "null ptr passed", NULL_PTR_PASSED);
-    
-    auto map_keys_view = std::views::keys(short_options);
-    std::vector<char> keys{map_keys_view.begin(), map_keys_view.end() };
-    char* short_options_keys_arr = &keys[0];
-
-    int opt = -1;
-    while ((opt = getopt_long(argc, argv, short_options_keys_arr, options, path_idx)) != -1) {
-        
-        if (opt == ':')
-            ass (false, "flag has no rquired argument", GETOPT_ERROR);
-
-        if (opt == '?')
-            ass (false, "unknown flag found", GETOPT_ERROR);
-
-        auto key_pair = short_options.find(opt); 
-
-        if (key_pair != short_options.end())
-            *short_options[opt].first = short_options[opt].second;  
-
-        else
-            ass (false, "unknown flag found", GETOPT_ERROR);
-       
-    }
-    
     return OK;
 }
